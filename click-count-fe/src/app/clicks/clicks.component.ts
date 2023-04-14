@@ -87,23 +87,12 @@ export class ClicksComponent implements OnInit, OnDestroy {
     this.httpClient.get(`https://geolocation-db.com/json/${ip_address}/`).subscribe(
     (response:any)=>{
       if (response) {
-        if (response.city || response.country_name) {
-          if(response.city){
-            this.city = response.city
-          }
-          else {
-            this.city = "Anonymous"
-          }
-          if(response.country){
-            this.country = response.country_name
-          }
-          else {
-            this.country = "Anonymous"
-          }
-          // this.city = response.city || "Anonymous"
-          // this.country = response.country_name || "Anonymous"
-        } else {
+        this.city = response.city
+        this.country = response.country_name
+        if (!this.city){
           this.city = "Anonymous"
+        }
+        if (!this.country){
           this.country = "Anonymous"
         }
       } else {
