@@ -21,6 +21,7 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzMessageModule } from 'ng-zorro-antd/message';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 
 
@@ -46,7 +47,8 @@ registerLocaleData(en);
     NzTableModule,
     NzMessageModule,
     NzGridModule,
-    NzTypographyModule
+    NzTypographyModule,
+    NzSpinModule
   ],
   providers: [
     { provide: NZ_I18N, useValue: en_US }

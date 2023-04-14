@@ -3,9 +3,7 @@ import {ClickApiService} from 'src/app/core/services/click-api.service';
 import {ClickData, location} from 'src/app/core/models/location.model';
 import { HttpClient } from '@angular/common/http';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { DataServiceService } from '../core/services/data-service.service';
-import { BehaviorSubject, Observable } from 'rxjs';
-
+import { delay } from 'rxjs';
 
 @Component({
   selector: 'app-clicks',
@@ -14,37 +12,86 @@ import { BehaviorSubject, Observable } from 'rxjs';
 })
 export class ClicksComponent implements OnInit {
   totalCount: number=0 ;
-  locations:location[]=[]
-  ip: string = ""
-  countData: ClickData = {success:true, locations:[], total_count: 0}
-
+  currentCount: number = 0;
+  locations:location[]=[];
+  ip: string = "";
+  countData: ClickData = {success:true, locations:[], total_count: 0};
+  city: string = "";
+  country: string = "";
+  isLoading: boolean = false;
+  isIpLoading: boolean = false;
+  isLocLoading: boolean = false;
   constructor(
     private clickService: ClickApiService,
     private httpClient: HttpClient,
     private message: NzMessageService,
-    private dataservice: DataServiceService
   ) { }
 
   ngOnInit(): void {
+    this.currentCount = 0
+    window.addEventListener('onbeforeunload', this.onBeforeUnload);
     this.getIp();
     this.loadCountData()
-  
+
+  }
+
+  onBeforeUnload(){
+    console.log(this.currentCount)
+    this.clickService.postCountData(this.ip, this.currentCount, this.city, this.country).subscribe(
+    );
   }
 
   getIp(){
+    this.isIpLoading = true;
     this.httpClient.get('https://api.ipify.org?format=json').subscribe(
       (value:any) => {
-        console.log(value)
         this.ip = value.ip;
+        if (this.ip) {
+          this.getLocation(this.ip)
+        }
+        else {
+          this.city = "Anonymous"
+          this.country = "Anonymous"
+        }
+        this.isIpLoading = false;
       },
       (error) => {
-        console.log(error);
+        this.city = "Anonymous"
+        this.country = "Anonymous"
+        this.isIpLoading = false;
       }
     );
   }
 
+  getLocation(ip_address: string){
+    this.isLocLoading = true;
+    this.httpClient.get(`https://geolocation-db.com/json/${ip_address}/`).subscribe(
+    (response:any)=>{
+      if (response) {
+        if (response.city && response.country_name) {
+          this.city = response.city
+          this.country = response.country_name
+        } else {
+          this.city = "Anonymous"
+          this.country = "Anonymous"
+        }
+      } else {
+        this.city = "Anonymous"
+        this.country = "Anonymous"
+      }
+      this.isLocLoading = false;
+    },
+    (error) => {
+      this.city = "Anonymous"
+      this.country = "Anonymous"
+      this.isLocLoading = false;
+    }
+    )
+  }
+
   loadCountData(){
-    this.clickService.getCountData$().subscribe((res: ClickData)=>{
+    this.isLoading = true;
+    this.clickService.getCountData().pipe(delay(6000)).subscribe((res: ClickData)=>{
       console.log(res)
       if (res.success) {
         this.countData = res
@@ -54,21 +101,19 @@ export class ClicksComponent implements OnInit {
           nzDuration: 4000
         });
       }
+      this.isLoading = false;
     },(error) => {
-      console.log(error);
+      this.isLoading = false;
     });
   }
 
   OnClick(){
-    this.clickService.postCountData(this.ip).subscribe((res)=>{
-      if (res.success==false) {
-        this.message.error('Something went wrong. Try Again!', {
-          nzDuration: 4000
-        });
-      } 
-      // else {
-      //   this.loadCountData();
-      // }
-    })
+    this.currentCount+=1
   }
+
+  ngOnDestroy() {
+    this.clickService.postCountData(this.ip, this.currentCount, this.city, this.country).subscribe()
+    window.removeEventListener('beforeunload', this.onBeforeUnload);
+  }
+
 }

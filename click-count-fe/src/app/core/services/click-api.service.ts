@@ -8,33 +8,18 @@ import { ClickData } from '../models/location.model';
   providedIn: 'root'
 })
 export class ClickApiService {
-  private clickData$ = new BehaviorSubject<any>({});
   constructor(
     private httpClient: HttpClient
   ) { }
 
 
-  getCountData(): Observable<ClickData> {
-    return  this.httpClient.get<ClickData>(environment.BASE_URL + '/click-count/').pipe(
-      tap((data: ClickData)=>{
-        this.clickData$.next(data)
-      })
-    )
+  getCountData() {
+    return  this.httpClient.get<ClickData>(environment.BASE_URL + '/click-count/')
   }
 
-  getCountData$():Observable<ClickData> {
-    return this.clickData$.asObservable();
-  }
-
-
-  postCountData(ip:string): Observable<any>{
-    return  this.httpClient.post<any>(environment.BASE_URL + '/click-count/', {"ip":ip}).pipe(
-      tap(()=>{
-          this.getCountData().subscribe();
-
-      }
-      )
-    )
+  postCountData(ip:string, currentCount:number, city:string, country:string){
+    return  this.httpClient.post<any>(environment.BASE_URL + '/click-count/',
+      {"ip":ip, "currentCount": currentCount, "city": city, "country": country})
 
   }
 
