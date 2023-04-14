@@ -1,9 +1,10 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, SimpleChanges, ViewContainerRef } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, SimpleChanges, ViewContainerRef } from '@angular/core';
 import {ClickApiService} from 'src/app/core/services/click-api.service';
 import {ClickData, location} from 'src/app/core/models/location.model';
 import { HttpClient } from '@angular/common/http';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { delay } from 'rxjs';
+import { Router, NavigationStart  } from '@angular/router';
 
 @Component({
   selector: 'app-clicks',
@@ -25,11 +26,13 @@ export class ClicksComponent implements OnInit, OnDestroy {
     private clickService: ClickApiService,
     private httpClient: HttpClient,
     private message: NzMessageService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
     this.currentCount = 0
     // window.addEventListener('beforeunload', this.onBeforeUnload);
+    window.addEventListener('unload', this.onUnload.bind(this));
     this.getIp();
     this.loadCountData()
 
@@ -41,7 +44,15 @@ export class ClicksComponent implements OnInit, OnDestroy {
     }
     );
   }
-
+  onUnload(){
+    console.log(this.currentCount)
+    this.clickService.postCountData(this.ip, this.currentCount, this.city, this.country).subscribe(()=>{
+      location.reload();
+    }
+    );
+  }
+  
+  @HostListener('window:beforeunload', ['$event'])
   onBeforeUnload(){
     console.log(this.currentCount)
     this.clickService.postCountData(this.ip, this.currentCount, this.city, this.country).subscribe(()=>{
