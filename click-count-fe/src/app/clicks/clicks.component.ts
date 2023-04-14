@@ -95,7 +95,7 @@ export class ClicksComponent implements OnInit, OnDestroy {
             this.city = "Anonymous"
           }
           if(response.country){
-            this.country = response.city
+            this.country = response.country_name
           }
           else {
             this.country = "Anonymous"
