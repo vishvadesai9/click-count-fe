@@ -51,8 +51,7 @@ export class ClicksComponent implements OnInit, OnDestroy {
     }
     );
   }
-  
-  @HostListener('window:beforeunload', ['$event'])
+
   onBeforeUnload(){
     console.log(this.currentCount)
     this.clickService.postCountData(this.ip, this.currentCount, this.city, this.country).subscribe(()=>{
@@ -89,8 +88,20 @@ export class ClicksComponent implements OnInit, OnDestroy {
     (response:any)=>{
       if (response) {
         if (response.city || response.country_name) {
-          this.city = response.city || "Anonymous"
-          this.country = response.country_name || "Anonymous"
+          if(response.city){
+            this.city = response.city
+          }
+          else {
+            this.city = "Anonymous"
+          }
+          if(response.country){
+            this.country = response.city
+          }
+          else {
+            this.country = "Anonymous"
+          }
+          // this.city = response.city || "Anonymous"
+          // this.country = response.country_name || "Anonymous"
         } else {
           this.city = "Anonymous"
           this.country = "Anonymous"
