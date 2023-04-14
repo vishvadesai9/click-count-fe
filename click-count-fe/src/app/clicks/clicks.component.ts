@@ -111,9 +111,5 @@ export class ClicksComponent implements OnInit {
     this.currentCount+=1
   }
 
-  ngOnDestroy() {
-    this.clickService.postCountData(this.ip, this.currentCount, this.city, this.country).subscribe()
-    window.removeEventListener('beforeunload', this.onBeforeUnload);
-  }
 
 }
