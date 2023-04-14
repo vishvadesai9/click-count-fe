@@ -29,7 +29,7 @@ export class ClicksComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentCount = 0
-    window.addEventListener('onbeforeunload', this.onBeforeUnload);
+    window.addEventListener('beforeunload', this.onBeforeUnload);
     this.getIp();
     this.loadCountData()
 
@@ -37,7 +37,9 @@ export class ClicksComponent implements OnInit {
 
   onBeforeUnload(){
     console.log(this.currentCount)
-    this.clickService.postCountData(this.ip, this.currentCount, this.city, this.country).subscribe(
+    this.clickService.postCountData(this.ip, this.currentCount, this.city, this.country).subscribe(()=>{
+      location.reload();
+    }
     );
   }
 
@@ -68,9 +70,9 @@ export class ClicksComponent implements OnInit {
     this.httpClient.get(`https://geolocation-db.com/json/${ip_address}/`).subscribe(
     (response:any)=>{
       if (response) {
-        if (response.city && response.country_name) {
-          this.city = response.city
-          this.country = response.country_name
+        if (response.city || response.country_name) {
+          this.city = response.city || "Anonymous"
+          this.country = response.country_name || "Anonymous"
         } else {
           this.city = "Anonymous"
           this.country = "Anonymous"
@@ -91,7 +93,7 @@ export class ClicksComponent implements OnInit {
 
   loadCountData(){
     this.isLoading = true;
-    this.clickService.getCountData().pipe(delay(6000)).subscribe((res: ClickData)=>{
+    this.clickService.getCountData().pipe(delay(0)).subscribe((res: ClickData)=>{
       console.log(res)
       if (res.success) {
         this.countData = res
