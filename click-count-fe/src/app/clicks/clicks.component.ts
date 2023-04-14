@@ -32,20 +32,12 @@ export class ClicksComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.currentCount = 0
     // window.addEventListener('beforeunload', this.onBeforeUnload);
-    window.addEventListener('unload', this.onUnload.bind(this));
     this.getIp();
     this.loadCountData()
 
   }
 
   ngOnDestroy(): void {
-    this.clickService.postCountData(this.ip, this.currentCount, this.city, this.country).subscribe(()=>{
-      location.reload();
-    }
-    );
-  }
-  onUnload(){
-    console.log(this.currentCount)
     this.clickService.postCountData(this.ip, this.currentCount, this.city, this.country).subscribe(()=>{
       location.reload();
     }
