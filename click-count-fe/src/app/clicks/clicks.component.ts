@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, SimpleChanges, ViewContainerRef } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, SimpleChanges, ViewContainerRef } from '@angular/core';
 import {ClickApiService} from 'src/app/core/services/click-api.service';
 import {ClickData, location} from 'src/app/core/models/location.model';
 import { HttpClient } from '@angular/common/http';
@@ -10,7 +10,7 @@ import { delay } from 'rxjs';
   templateUrl: './clicks.component.html',
   styleUrls: ['./clicks.component.scss']
 })
-export class ClicksComponent implements OnInit {
+export class ClicksComponent implements OnInit, OnDestroy {
   totalCount: number=0 ;
   currentCount: number = 0;
   locations:location[]=[];
@@ -29,10 +29,17 @@ export class ClicksComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentCount = 0
-    window.addEventListener('beforeunload', this.onBeforeUnload);
+    // window.addEventListener('beforeunload', this.onBeforeUnload);
     this.getIp();
     this.loadCountData()
 
+  }
+
+  ngOnDestroy(): void {
+    this.clickService.postCountData(this.ip, this.currentCount, this.city, this.country).subscribe(()=>{
+      location.reload();
+    }
+    );
   }
 
   onBeforeUnload(){
