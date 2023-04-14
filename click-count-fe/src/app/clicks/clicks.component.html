@@ -1,0 +1,46 @@
+<nz-layout class="layout" (window:beforeunload)="onBeforeUnload()">
+    <!-- <nz-alert nzType="error" nzMessage="Something Went Wrong. Try Again"></nz-alert> -->
+    <nz-content class="content">
+      <nz-spin nzSimple [nzSize]="'large'" *ngIf="isLoading || isIpLoading || isLocLoading"></nz-spin>
+        <div nz-row class="data-container" *ngIf="!isLoading && !isIpLoading && !isLocLoading">
+          
+          <div nz-col [nzXl]="24" [nzLg]="18" [nzSm]="10">
+          <div nz-row [nzGutter]="[{ xxl: 36, xl: 26, lg: 24, md:20},{ xxl: 36, xl: 16, lg: 24, md:20}]" class="count-container">
+            <h2 nz-typography><span class="count">{{countData.total_count + currentCount}}</span> <span class="txt">Clicks</span> </h2>
+          </div>
+            <div nz-row [nzGutter]="[{ xxl: 36, xl: 26, lg: 24, md:20},{ xxl: 36, xl: 16, lg: 24, md:20}]" class="btn-container">
+                <button nz-button class="btn slide_down" (click)="OnClick()">Click Me!!</button>
+            </div>
+            <div nz-row [nzGutter]="[{ xxl: 36, xl: 26, lg: 24, md:20},{ xxl: 36, xl: 16, lg: 24, md:20}]" class="table-container" *ngIf="countData.locations.length!=0 && countData.total_count !=0">
+                <nz-table #headerTable [nzPageSize]="10"  [nzData]="countData.locations"
+                nzBordered="false" class="table">
+                    <thead>
+                      <tr>
+                        <th [nzBreakWord]="true" class="labels">City</th>
+                        <th [nzBreakWord]="true" class="labels">Country</th>
+                        <th [nzBreakWord]="true" class="labels">Click Count</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let data of headerTable.data">
+                        <td>{{ data.city }}</td>
+                        <td>{{ data.country }}</td>
+                        <td *ngIf="data.city == city && data.country == country">{{ data.count + currentCount }}</td>
+                        <td *ngIf="data.city != city || data.country != country">{{ data.count }}</td>
+                      </tr>
+                      <!-- <tr>
+                        <td>Salt Lake</td>
+                        <td>Utah</td>
+                        <td>5</td>
+                      </tr> -->
+                    </tbody>
+                  </nz-table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- <nz-alert nzType="error" nzMessage="Something Went Wrong. Try Again"></nz-alert> -->
+    </nz-content>
+    
+
+</nz-layout>
